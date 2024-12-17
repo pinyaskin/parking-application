@@ -1,0 +1,71 @@
+version: "3.7"
+
+services:
+
+  database:
+    image: postgres:17.2
+    restart: on-failure
+    ports:
+      - "5432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: thesis
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+  eureka-discovery:
+    image: thesis/eureka-discovery:0.0.1-SNAPSHOT
+    restart: unless-stopped
+    ports:
+      - "8012:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      CONFIG_SERVER_URL: http://configserver:8071
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8761/actuator/health || exit 1
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+    labels:
+      amplicode.image: springboot
+
+  configserver:
+    image: thesis/configserver:0.0.1-SNAPSHOT
+    restart: on-failure
+    ports:
+      - "8071:8071"
+    environment:
+      GITHUB_USERNAME: ${GITHUB_USERNAME}
+      GITHUB_PASSWORD: ${GITHUB_PASSWORD}
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8071/actuator/health || exit 1
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+    labels:
+      amplicode.image: springboot
+
+  parkingservice:
+    image: thesis/parking:0.0.1-SNAPSHOT
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://configserver:8071
+      EUREKA_URI: http://eureka-discovery:8761/eureka
+    labels:
+      amplicode.image: springboot
+
+volumes:
+  database_data:
