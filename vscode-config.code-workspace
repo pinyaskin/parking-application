@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../thesis-config"
+		},
+		{
+			"path": "configserver"
+		},
+		{
+			"path": "parking"
+		}
+	],
+	"settings": {}
+}
