@@ -26,6 +26,8 @@ services:
     restart: unless-stopped
     ports:
       - "8012:8761"
+    depends_on:
+      - configserver
     environment:
       SPRING_PROFILES_ACTIVE: dev
       CONFIG_SERVER_URL: http://configserver:8071
@@ -64,6 +66,24 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_SERVER_URL: http://configserver:8071
       EUREKA_URI: http://eureka-discovery:8761/eureka
+    labels:
+      amplicode.image: springboot
+
+  bookingservice:
+    image: thesis/booking:0.0.1-SNAPSHOT
+    restart: on-failure
+    ports:
+      - "8189:8189"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URI: http://configserver:8071
+      EUREKA_URI: http://eureka-discovery:8761/eureka
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8189/actuator/health || exit 1
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
     labels:
       amplicode.image: springboot
 
