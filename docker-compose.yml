@@ -76,7 +76,7 @@ services:
       - "8189:8189"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      CONFIG_SERVER_URI: http://configserver:8071
+      CONFIG_SERVER_URL: http://configserver:8071
       EUREKA_URI: http://eureka-discovery:8761/eureka
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:8189/actuator/health || exit 1

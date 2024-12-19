@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/bookings")
@@ -50,6 +51,7 @@ public class BookingController {
 
     @PostMapping
     public Booking create(@RequestBody Booking booking) {
+        booking.setId(UUID.randomUUID().toString());
         return bookingRepository.save(booking);
     }
 

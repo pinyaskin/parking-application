@@ -3,4 +3,4 @@ spring:
     name: booking-service
 
   config:
-    import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8071}
+    import: configserver:${CONFIG_SERVER_URL:http://localhost:8071}
